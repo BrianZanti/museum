@@ -16,6 +16,7 @@ class Museum
   end
 
   def admit(patron)
+    @revenue += 10
     patron.interests.each do |interest|
       price = @exhibits[interest]
       if price != nil
@@ -34,8 +35,25 @@ class Museum
   end
 
   def patrons_of(exhibit)
+    return [] unless @patrons[exhibit]
     @patrons[exhibit].map do |patron|
       patron.name
+    end
+  end
+
+  def exhibits_by_attendees
+    sorted = @exhibits.sort_by do |name, cost|
+      -patrons_of(name).length
+    end
+
+    sorted.map do |name, cost|
+      name
+    end
+  end
+
+  def remove_unpopular_exhibits(threshold)
+    @exhibits.delete_if do |name, cost|
+      patrons_of(name).length <= threshold
     end
   end
 end
